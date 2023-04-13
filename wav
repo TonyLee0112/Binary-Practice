@@ -11,7 +11,7 @@ int main()
     // Check if file was successfully opened
     if (!myfile)
     {
-        cout << "Cannot read example.wav\n";
+        cout << "Cannot read wave_sample\n";
         return 666;
     }
 
@@ -20,26 +20,26 @@ int main()
     myfile.read(header, 44);
 
     // Get the sample rate from the header
-    unsigned int* SampleRate = (unsigned int*)(header + 24);
+    unsigned int* SampleRate = reinterpret_cast<unsigned int*>(header + 24);
     unsigned int sampleRateValue = *SampleRate;
 
-    short data[1000];
-    short idt[1000];
-    myfile.read((char*)data, 1000);
-    ofstream aaa("data.txt");
-    aaa.write((char*)(data), sizeof(data));
-    float dt = 1. / SampleRate[0];
-    for (int i = 0; i < 1000; i++) {
-        idt[i] = i * dt;
-    }
-    aaa.write((char*)idt, sizeof(idt));
-    
-    for (int i = 0; i < 500; i++) {
-        cout << i * dt << " " << data[i * 2] << " " << data[i * 2 + 1] << endl;
-
-    }
     // Print the sample rate
     cout << "Sample rate: " << sampleRateValue << endl;
+
+    short data[1000];
+
+    myfile.read((char*)data, 1000);
+    myfile.seekg(SampleRate[0] * 10);
+
+    ofstream aaa("data.txt");
+    if (!aaa) return 666;
+    float dt = 1. / SampleRate[0];
+    for (int i = 0; i < 500; i++) {
+        // cout << i * dt << " " << data[i * 2] << data[i * 2 + 1] << endl;
+        aaa << i * dt << " " << data[i * 2] << " " << data[i * 2 + 1] << endl;
+
+    }
+    aaa.close();
 
     // Close the file
     myfile.close();
