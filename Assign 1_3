@@ -1,0 +1,72 @@
+#include <fstream>
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+float* calc_step2(float start, float step) {
+	float* a = new float[5];
+	for (int i = 0; i <= 4; i++) {
+		float result = (start + step * i) * 5;
+		a[i] = result;
+	}
+	return a;
+}
+
+float* calc_step3(float start, float step) {
+	float* b = new float[5];
+	for (int i = 0; i <= 2; i++) {
+		float result2 = pow(start + step * i,2);
+		b[i] = result2;
+	}
+	return b;
+}
+
+int main() {
+	float num = 1234;
+
+	double start1 = 1000;
+	double step1 = 1000;
+	float* a;
+
+	double start2 = -0.5;
+	double step2 = 0.5;
+	float* b;
+
+	float combined[9];
+
+	float c[9];
+
+	ofstream mybin;
+	mybin.open("mybin.dat", ios::binary | ios::out);
+
+	// 1번 combined[]에 넣기
+	combined[0] = num;
+	
+	// 2번 combined[]에 넣기
+	a = calc_step2(start1, step1);
+	for (int i = 0; i < 5; ++i) {
+		combined[i + 1] = a[i];
+	}
+
+	// 3번 combined[] 넣기
+	b = calc_step3(start2, step2);
+	for (int i = 0; i < 3; ++i) {
+		combined[i + 6] = b[i];
+	}
+	
+	mybin.write((char*)combined, 9 * sizeof(float)); // sizeof(b)가 아닌 3 * sizeof(float)로 수정
+
+	mybin.close();
+
+	// file 확인
+	ifstream read_mybin;
+	read_mybin.open("mybin.dat", ios::binary | ios::in);
+	read_mybin.read((char*)&c, sizeof(c));
+	for (int i = 0; i < 9; i++)
+		cout << c[i] << endl;
+	read_mybin.close();
+
+	delete[] a; // 동적으로 할당한 메모리 해제
+
+	return 0;
+}
